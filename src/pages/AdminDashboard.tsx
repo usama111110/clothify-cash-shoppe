@@ -1,51 +1,48 @@
 
-import { useEffect, useState } from "react";
-import { getOrders } from "@/services/api";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Order } from "@/data/mockData";
 import { salesData, categoryStats } from "@/data/mockData";
+import { getDashboardStats, getOrders } from "@/services/api";
 import Sidebar from "@/components/admin/Sidebar";
 import DashboardCard from "@/components/admin/DashboardCard";
 import SalesChart from "@/components/admin/SalesChart";
 import CategoryStats from "@/components/admin/CategoryStats";
 import RecentOrders from "@/components/admin/RecentOrders";
-import { Activity, DollarSign, LogOut, Package, Settings, Users } from "lucide-react";
+import { Activity, DollarSign, Package, Users } from "lucide-react";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AdminDashboard = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getOrders();
-        setOrders(data);
-        toast.success("Dashboard data loaded successfully");
-      } catch (error) {
-        console.error("Failed to fetch orders:", error);
-        toast.error("Failed to load dashboard data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data: dashboardStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: getDashboardStats,
+    onError: (error) => {
+      console.error("Failed to fetch dashboard stats:", error);
+      toast.error("Failed to load dashboard statistics");
+    }
+  });
 
-    fetchOrders();
-  }, []);
+  const { data: orders, isLoading: ordersLoading } = useQuery({
+    queryKey: ['admin-orders'],
+    queryFn: getOrders,
+    onError: (error) => {
+      console.error("Failed to fetch orders:", error);
+      toast.error("Failed to load order data");
+    }
+  });
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminAuth");
-    toast.success("Logged out successfully");
-    navigate("/admin/login");
+  const isLoading = statsLoading || ordersLoading;
+
+  // Format numbers for display
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(value);
   };
-
-  // Calculate some basic stats
-  const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
-  const totalOrders = orders.length;
-  const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -55,9 +52,8 @@ const AdminDashboard = () => {
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Dashboard</h1>
-            <Button variant="outline" onClick={handleLogout} className="gap-2">
-              <LogOut size={16} />
-              Logout
+            <Button variant="outline" asChild>
+              <a href="/admin/orders">View All Orders</a>
             </Button>
           </div>
           
@@ -72,48 +68,100 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <DashboardCard
                 title="Total Revenue"
-                value={`$${totalSales.toFixed(2)}`}
-                icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+                value={formatCurrency(dashboardStats?.totalRevenue || 0)}
+                icon={<DollarSign className="h-5 w-5 text-emerald-600" />}
                 description="Total revenue from all orders"
+                trend={{
+                  value: "+12.5%",
+                  direction: "up"
+                }}
               />
               
               <DashboardCard
                 title="Total Orders"
-                value={totalOrders.toString()}
-                icon={<Package className="h-4 w-4 text-muted-foreground" />}
+                value={(dashboardStats?.ordersCount || 0).toString()}
+                icon={<Package className="h-5 w-5 text-blue-600" />}
                 description="Number of orders received"
+                trend={{
+                  value: "+8.2%",
+                  direction: "up"
+                }}
               />
               
               <DashboardCard
                 title="Avg. Order Value"
-                value={`$${avgOrderValue.toFixed(2)}`}
-                icon={<Activity className="h-4 w-4 text-muted-foreground" />}
+                value={formatCurrency(dashboardStats?.avgOrderValue || 0)}
+                icon={<Activity className="h-5 w-5 text-purple-600" />}
                 description="Average value per order"
+                trend={{
+                  value: "+3.1%",
+                  direction: "up"
+                }}
               />
               
               <DashboardCard
                 title="Total Customers"
-                value={orders.length.toString()}
-                icon={<Users className="h-4 w-4 text-muted-foreground" />}
+                value={(dashboardStats?.customersCount || 0).toString()}
+                icon={<Users className="h-5 w-5 text-orange-600" />}
                 description="Unique customer count"
+                trend={{
+                  value: "+5.4%",
+                  direction: "up"
+                }}
               />
             </div>
           )}
           
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 mb-8">
-            <SalesChart data={salesData} />
-            <CategoryStats data={categoryStats} />
+            <Card className="col-span-6 lg:col-span-4 shadow-soft">
+              <CardHeader>
+                <CardTitle>Sales Overview</CardTitle>
+                <CardDescription>Monthly revenue for the current year</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="h-80 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <SalesChart data={dashboardStats?.salesData || salesData} />
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card className="col-span-6 lg:col-span-2 shadow-soft">
+              <CardHeader>
+                <CardTitle>Categories</CardTitle>
+                <CardDescription>Sales by product category</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="h-80 bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  <CategoryStats data={dashboardStats?.categoryStats || categoryStats} />
+                )}
+              </CardContent>
+            </Card>
           </div>
           
           {/* Recent Orders Table */}
-          <div className="mb-6">
-            {isLoading ? (
-              <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
-            ) : (
-              <RecentOrders orders={orders} />
-            )}
-          </div>
+          <Card className="shadow-soft">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Recent Orders</CardTitle>
+                <CardDescription>Latest customer purchases</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <a href="/admin/orders">View All</a>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
+              ) : (
+                <RecentOrders orders={orders?.slice(0, 5) || []} />
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

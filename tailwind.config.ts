@@ -54,11 +54,11 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				shop: {
-					primary: '#333333',
-					secondary: '#f8f8f8',
-					accent: '#e91e63',
+					primary: '#303f9f',
+					secondary: '#f5f5f7',
+					accent: '#7c4dff',
 					light: '#ffffff',
-					dark: '#222222',
+					dark: '#1a1a2e',
 					muted: '#f1f1f1',
 				},
 				sidebar: {
@@ -103,6 +103,10 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fadeIn 0.5s ease-in'
+			},
+			boxShadow: {
+				'soft': '0 2px 15px rgba(0, 0, 0, 0.08)',
+				'card': '0 4px 20px rgba(0, 0, 0, 0.05)'
 			}
 		}
 	},
