@@ -14,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 234 48% 40%;
+    --primary: 263 60% 54%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 240 5% 96%;
@@ -36,19 +36,12 @@
     --radius: 0.75rem;
 
     --sidebar-background: 230 36% 14%;
-
     --sidebar-foreground: 210 40% 98%;
-
     --sidebar-primary: 262 68% 65%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 230 36% 20%;
-
     --sidebar-accent-foreground: 210 40% 98%;
-
     --sidebar-border: 230 36% 20%;
-
     --sidebar-ring: 262 68% 65%;
   }
 
@@ -117,6 +110,24 @@
   h3 {
     @apply text-xl sm:text-2xl;
   }
+
+  /* Scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--accent) / 0.5);
+    border-radius: 20px;
+  }
 }
 
 @layer components {
@@ -126,5 +137,60 @@
   
   .btn-hover {
     @apply transform transition-transform duration-200 hover:-translate-y-1;
+  }
+
+  .bg-gradient-soft {
+    @apply bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply backdrop-blur-md bg-white/70 dark:bg-gray-800/70;
+  }
+
+  .shadow-soft {
+    @apply shadow-[0_8px_30px_rgb(0,0,0,0.06)];
+  }
+  
+  .shadow-card {
+    @apply shadow-[0_12px_24px_rgb(0,0,0,0.08)];
+  }
+}
+
+@layer utilities {
+  /* Animation Keyframes */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+  }
+
+  .animate-float {
+    animation: float 5s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+
+  /* Gradient Backgrounds */
+  .bg-gradient-purple {
+    @apply bg-gradient-to-r from-purple-600 to-indigo-600;
+  }
+
+  .bg-gradient-blue {
+    @apply bg-gradient-to-r from-blue-500 to-teal-400;
+  }
+
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-primary via-accent to-primary/80;
   }
 }

@@ -31,24 +31,24 @@ const AdminOrders = () => {
       }
       return response.json();
     },
-    onError: () => {
-      // Fallback to using mock data if API is not available
-      import("@/data/mockData").then(({ orders }) => {
-        return orders;
-      });
+    onSettled: (data, error) => {
+      if (error) {
+        console.error("Failed to fetch orders:", error);
+        // Fallback to using mock data will happen at component level
+      }
     },
   });
 
   const getStatusBadge = (status: Order["status"]) => {
     switch (status) {
       case "delivered":
-        return <Badge className="bg-green-500">Delivered</Badge>;
+        return <Badge className="bg-emerald-500 text-white hover:bg-emerald-600">Delivered</Badge>;
       case "shipped":
-        return <Badge className="bg-blue-500">Shipped</Badge>;
+        return <Badge className="bg-blue-500 text-white hover:bg-blue-600">Shipped</Badge>;
       case "processing":
-        return <Badge className="bg-yellow-500">Processing</Badge>;
+        return <Badge className="bg-amber-500 text-white hover:bg-amber-600">Processing</Badge>;
       case "pending":
-        return <Badge className="bg-gray-400">Pending</Badge>;
+        return <Badge className="bg-gray-400 text-white hover:bg-gray-500">Pending</Badge>;
       case "cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
       default:
@@ -99,15 +99,15 @@ const AdminOrders = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <Sidebar />
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Orders</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Orders</h1>
           </div>
           <div className="grid gap-4">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 animate-pulse rounded-md"></div>
+              <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md"></div>
             ))}
           </div>
         </div>
@@ -117,13 +117,13 @@ const AdminOrders = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <Sidebar />
         <div className="flex-1 p-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Orders</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Orders</h1>
           </div>
-          <Card>
+          <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none shadow-soft">
             <CardContent className="pt-6">
               <div className="text-center py-10">
                 <p className="text-red-500 mb-4">Error loading orders. Please try again later.</p>
@@ -137,11 +137,11 @@ const AdminOrders = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <Sidebar />
       <div className="flex-1 p-8 overflow-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold flex items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <h1 className="text-3xl font-bold flex items-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             <Package className="mr-2" /> Orders Management
           </h1>
           <div className="relative w-full md:w-64">
@@ -150,13 +150,13 @@ const AdminOrders = () => {
               placeholder="Search orders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
+              className="pl-8 backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 border-none shadow-sm"
             />
           </div>
         </div>
 
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-3">
             <Filter className="h-4 w-4" />
             <span className="text-sm font-medium">Filter by status:</span>
           </div>
@@ -167,6 +167,7 @@ const AdminOrders = () => {
                   key={status}
                   variant={statusFilter === status ? "default" : "outline"}
                   size="sm"
+                  className={`shadow-sm ${statusFilter === status ? 'shadow-md' : ''} transition-all`}
                   onClick={() => handleStatusFilterClick(status)}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -176,9 +177,9 @@ const AdminOrders = () => {
           </div>
         </div>
 
-        <Card>
+        <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none shadow-soft">
           <CardHeader className="pb-3">
-            <CardTitle>All Orders</CardTitle>
+            <CardTitle className="text-xl font-medium">All Orders</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border overflow-hidden">
@@ -211,7 +212,7 @@ const AdminOrders = () => {
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <select 
-                              className="text-xs border rounded px-2 py-1 bg-white"
+                              className="text-xs border rounded px-2 py-1 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm"
                               onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
                               value={order.status}
                             >
@@ -221,7 +222,7 @@ const AdminOrders = () => {
                               <option value="delivered">Delivered</option>
                               <option value="cancelled">Cancelled</option>
                             </select>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" className="shadow-sm hover:shadow-md transition-shadow">
                               View
                             </Button>
                           </div>

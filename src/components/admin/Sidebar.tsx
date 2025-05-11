@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -58,49 +59,66 @@ const Sidebar = () => {
   return (
     <aside 
       className={cn(
-        "bg-shop-dark text-white transition-all duration-300 flex flex-col relative",
+        "bg-sidebar shadow-xl transition-all duration-300 flex flex-col relative z-10",
         collapsed ? "w-20" : "w-64"
       )}
     >
       <button 
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 bg-shop-accent text-white rounded-full p-1 shadow-md"
+        className="absolute -right-3 top-20 bg-accent text-white rounded-full p-1 shadow-md hover:scale-110 transition-transform"
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <ChevronRight 
           size={16} 
-          className={cn("transition-transform", collapsed ? "rotate-0" : "rotate-180")}
+          className={cn("transition-transform duration-300", collapsed ? "rotate-0" : "rotate-180")}
         />
       </button>
 
       {/* Logo */}
-      <div className={cn("p-6 border-b border-gray-700 flex items-center", 
-                       collapsed ? "justify-center" : "")}>
+      <div className={cn(
+        "p-6 border-b border-sidebar-border flex items-center", 
+        collapsed ? "justify-center" : "",
+        "bg-gradient-to-r from-sidebar-accent to-sidebar"
+      )}>
         {collapsed ? (
-          <span className="text-xl font-bold">SH</span>
+          <span className="text-xl font-bold text-white">SH</span>
         ) : (
-          <Link to="/admin" className="text-xl font-bold">
+          <Link to="/admin" className="text-xl font-bold text-white">
             StyleHaven Admin
           </Link>
         )}
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 p-4 overflow-y-auto">
+      <nav className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-sidebar-accent scrollbar-track-sidebar">
         <ul className="space-y-1">
           {menuItems.map((item) => (
             <li key={item.name}>
               <Link
                 to={item.path}
                 className={cn(
-                  "flex items-center py-2 px-4 rounded-md transition-colors",
+                  "flex items-center py-2 px-4 rounded-md transition-all duration-200",
                   isActive(item.path)
-                    ? "bg-shop-accent text-white"
-                    : "hover:bg-gray-700"
+                    ? "bg-sidebar-primary text-white shadow-md translate-x-1"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white"
                 )}
                 title={collapsed ? item.name : undefined}
               >
-                <span className={cn(collapsed ? "mx-auto" : "mr-3")}>{item.icon}</span>
-                {!collapsed && item.name}
+                <span className={cn(
+                  collapsed ? "mx-auto" : "mr-3",
+                  "transition-transform", 
+                  isActive(item.path) && !collapsed ? "scale-110" : ""
+                )}>
+                  {item.icon}
+                </span>
+                {!collapsed && (
+                  <span className={cn(
+                    "transition-transform",
+                    isActive(item.path) ? "font-medium" : ""
+                  )}>
+                    {item.name}
+                  </span>
+                )}
               </Link>
             </li>
           ))}
@@ -108,12 +126,12 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 border-t border-sidebar-border bg-sidebar-accent/30">
         <div className="flex flex-col space-y-2">
           <Button 
             asChild 
             variant="ghost" 
-            className="justify-start text-gray-300 hover:text-white hover:bg-gray-700"
+            className="justify-start text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent"
             title={collapsed ? "Back to Shop" : undefined}
           >
             <Link to="/">
@@ -123,7 +141,7 @@ const Sidebar = () => {
           </Button>
           <Button 
             variant="ghost" 
-            className="justify-start text-gray-300 hover:text-white hover:bg-gray-700"
+            className="justify-start text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent"
             onClick={handleLogout}
             title={collapsed ? "Logout" : undefined}
           >

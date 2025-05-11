@@ -24,9 +24,10 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   // Show loading while checking auth state
   if (isAdmin === null) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-        <div className="h-12 w-12 rounded-full border-4 border-t-transparent border-primary animate-spin"></div>
-        <p className="mt-4 text-gray-600">Verifying admin credentials...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="h-14 w-14 rounded-full border-4 border-t-transparent border-primary animate-spin"></div>
+        <p className="mt-6 text-gray-600 dark:text-gray-300 text-lg">Verifying admin credentials...</p>
+        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">Please wait</div>
       </div>
     );
   }

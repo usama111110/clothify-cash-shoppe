@@ -18,18 +18,22 @@ const AdminDashboard = () => {
   const { data: dashboardStats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: getDashboardStats,
-    onError: (error) => {
-      console.error("Failed to fetch dashboard stats:", error);
-      toast.error("Failed to load dashboard statistics");
+    onSettled: (data, error) => {
+      if (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+        toast.error("Failed to load dashboard statistics");
+      }
     }
   });
 
   const { data: orders, isLoading: ordersLoading } = useQuery({
     queryKey: ['admin-orders'],
     queryFn: getOrders,
-    onError: (error) => {
-      console.error("Failed to fetch orders:", error);
-      toast.error("Failed to load order data");
+    onSettled: (data, error) => {
+      if (error) {
+        console.error("Failed to fetch orders:", error);
+        toast.error("Failed to load order data");
+      }
     }
   });
 
@@ -45,14 +49,14 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <Sidebar />
       
       <div className="flex-1 overflow-x-hidden">
         <div className="p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <Button variant="outline" asChild>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Dashboard</h1>
+            <Button variant="outline" className="shadow-sm hover:shadow-md transition-shadow" asChild>
               <a href="/admin/orders">View All Orders</a>
             </Button>
           </div>
@@ -61,7 +65,7 @@ const AdminDashboard = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
               ))}
             </div>
           ) : (
@@ -114,28 +118,28 @@ const AdminDashboard = () => {
           
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 mb-8">
-            <Card className="col-span-6 lg:col-span-4 shadow-soft">
+            <Card className="col-span-6 lg:col-span-4 shadow-soft backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none">
               <CardHeader>
-                <CardTitle>Sales Overview</CardTitle>
+                <CardTitle className="text-xl font-medium">Sales Overview</CardTitle>
                 <CardDescription>Monthly revenue for the current year</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="h-80 bg-gray-200 animate-pulse rounded"></div>
+                  <div className="h-80 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
                 ) : (
                   <SalesChart data={dashboardStats?.salesData || salesData} />
                 )}
               </CardContent>
             </Card>
             
-            <Card className="col-span-6 lg:col-span-2 shadow-soft">
+            <Card className="col-span-6 lg:col-span-2 shadow-soft backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none">
               <CardHeader>
-                <CardTitle>Categories</CardTitle>
+                <CardTitle className="text-xl font-medium">Categories</CardTitle>
                 <CardDescription>Sales by product category</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="h-80 bg-gray-200 animate-pulse rounded"></div>
+                  <div className="h-80 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
                 ) : (
                   <CategoryStats data={dashboardStats?.categoryStats || categoryStats} />
                 )}
@@ -144,19 +148,19 @@ const AdminDashboard = () => {
           </div>
           
           {/* Recent Orders Table */}
-          <Card className="shadow-soft">
+          <Card className="shadow-soft backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Recent Orders</CardTitle>
+                <CardTitle className="text-xl font-medium">Recent Orders</CardTitle>
                 <CardDescription>Latest customer purchases</CardDescription>
               </div>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" className="shadow-sm hover:shadow-md transition-shadow" asChild>
                 <a href="/admin/orders">View All</a>
               </Button>
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
               ) : (
                 <RecentOrders orders={orders?.slice(0, 5) || []} />
               )}

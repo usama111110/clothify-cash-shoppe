@@ -23,18 +23,19 @@ const DashboardCard = ({
   trend,
 }: DashboardCardProps) => {
   return (
-    <Card className="shadow-soft hover:shadow-card transition-shadow duration-300">
+    <Card className="shadow-soft hover:shadow-card transition-all duration-300 backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary/50"></div>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <div className="rounded-full bg-muted p-2 text-muted-foreground">
+        <div className="rounded-full bg-primary/10 dark:bg-primary/20 p-2 text-primary">
           {icon}
         </div>
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-2">
           <CardDescription>{description}</CardDescription>
           {trend && (
             <div
