@@ -13,6 +13,8 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import CategoryPage from "./pages/CategoryPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminRoute from "./components/admin/AdminRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +33,8 @@ const App = () => (
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </StoreProvider>

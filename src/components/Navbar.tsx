@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,16 @@ interface NavbarProps {
 
 const Navbar = ({ cartItems }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const isMobile = useIsMobile();
   
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
   
+  useEffect(() => {
+    const adminAuth = localStorage.getItem("adminAuth");
+    setIsAdmin(adminAuth === "true");
+  }, []);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -86,7 +92,7 @@ const Navbar = ({ cartItems }: NavbarProps) => {
             </Link>
             
             {!isMobile && (
-              <Link to="/admin" className="text-sm text-gray-600 hover:text-shop-accent">
+              <Link to={isAdmin ? "/admin" : "/admin/login"} className="text-sm text-gray-600 hover:text-shop-accent">
                 Admin
               </Link>
             )}
@@ -110,7 +116,7 @@ const Navbar = ({ cartItems }: NavbarProps) => {
               ))}
               <li>
                 <Link
-                  to="/admin"
+                  to={isAdmin ? "/admin" : "/admin/login"}
                   className="block py-2 text-gray-600 hover:text-shop-accent transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >

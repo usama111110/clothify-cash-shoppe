@@ -11,10 +11,19 @@ import {
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminAuth");
+    toast.success("Logged out successfully");
+    navigate("/admin/login");
+  };
 
   const menuItems = [
     {
@@ -84,7 +93,11 @@ const Sidebar = () => {
               Back to Shop
             </Link>
           </Button>
-          <Button variant="ghost" className="justify-start text-gray-300 hover:text-white hover:bg-gray-700">
+          <Button 
+            variant="ghost" 
+            className="justify-start text-gray-300 hover:text-white hover:bg-gray-700"
+            onClick={handleLogout}
+          >
             <LogOut size={20} className="mr-3" />
             Logout
           </Button>
