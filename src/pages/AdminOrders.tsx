@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "@/components/admin/Sidebar";
 import {
   Table,
@@ -12,15 +12,18 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, Search, Filter } from "lucide-react";
+import { Package, Search, Filter, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Order } from "@/data/mockData";
+import { updateOrderStatus } from "@/services/api";
 
 const AdminOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: orders, isLoading, error } = useQuery({
     queryKey: ["admin-orders"],
@@ -31,13 +34,14 @@ const AdminOrders = () => {
       }
       return response.json();
     },
-    onSettled: (data, error) => {
-      if (error) {
-        console.error("Failed to fetch orders:", error);
-        // Fallback to using mock data will happen at component level
-      }
-    },
   });
+
+  useEffect(() => {
+    if (error) {
+      console.error("Failed to fetch orders:", error);
+      toast.error("Failed to load orders. Using fallback data.");
+    }
+  }, [error]);
 
   const getStatusBadge = (status: Order["status"]) => {
     switch (status) {
@@ -78,22 +82,25 @@ const AdminOrders = () => {
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      setIsUpdating(orderId);
+      // Update order status via API
+      await updateOrderStatus(orderId, newStatus);
+      
+      // Invalidate and refetch queries to update UI
+      await queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      
+      toast.success(`Order ${orderId} status updated to ${newStatus}`, {
+        description: "The order has been successfully updated",
+        action: {
+          label: "View",
+          onClick: () => console.log(`View order ${orderId}`),
         },
-        body: JSON.stringify({ status: newStatus }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to update order status");
-      }
-
-      toast.success(`Order ${orderId} status updated to ${newStatus}`);
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error("Failed to update order status");
+      toast.error("Failed to update order status. Please try again.");
+    } finally {
+      setIsUpdating(null);
     }
   };
 
@@ -123,7 +130,7 @@ const AdminOrders = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Orders</h1>
           </div>
-          <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none shadow-soft">
+          <Card className="backdrop-blur-md bg-white/90 dark:bg-gray-800/90 border-none shadow-lg rounded-xl">
             <CardContent className="pt-6">
               <div className="text-center py-10">
                 <p className="text-red-500 mb-4">Error loading orders. Please try again later.</p>
@@ -150,7 +157,7 @@ const AdminOrders = () => {
               placeholder="Search orders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 border-none shadow-sm"
+              className="pl-8 backdrop-blur-md bg-white/70 dark:bg-gray-800/70 border-none shadow-md rounded-lg"
             />
           </div>
         </div>
@@ -177,12 +184,12 @@ const AdminOrders = () => {
           </div>
         </div>
 
-        <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none shadow-soft">
-          <CardHeader className="pb-3">
+        <Card className="backdrop-blur-md bg-white/90 dark:bg-gray-800/90 border-none shadow-lg rounded-xl overflow-hidden">
+          <CardHeader className="pb-3 border-b border-gray-100 dark:border-gray-700">
             <CardTitle className="text-xl font-medium">All Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border overflow-hidden">
+            <div className="rounded-lg border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
@@ -212,9 +219,10 @@ const AdminOrders = () => {
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <select 
-                              className="text-xs border rounded px-2 py-1 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm"
+                              className="text-xs border rounded-lg px-2 py-1 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm"
                               onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
                               value={order.status}
+                              disabled={isUpdating === order.id}
                             >
                               <option value="pending">Pending</option>
                               <option value="processing">Processing</option>
@@ -222,7 +230,11 @@ const AdminOrders = () => {
                               <option value="delivered">Delivered</option>
                               <option value="cancelled">Cancelled</option>
                             </select>
-                            <Button variant="outline" size="sm" className="shadow-sm hover:shadow-md transition-shadow">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="shadow-sm hover:shadow-md transition-shadow rounded-lg"
+                            >
                               View
                             </Button>
                           </div>

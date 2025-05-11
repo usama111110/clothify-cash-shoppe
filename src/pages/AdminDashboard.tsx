@@ -15,27 +15,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AdminDashboard = () => {
-  const { data: dashboardStats, isLoading: statsLoading } = useQuery({
+  const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: getDashboardStats,
-    onSettled: (data, error) => {
-      if (error) {
-        console.error("Failed to fetch dashboard stats:", error);
-        toast.error("Failed to load dashboard statistics");
-      }
-    }
   });
 
-  const { data: orders, isLoading: ordersLoading } = useQuery({
+  if (statsError) {
+    console.error("Failed to fetch dashboard stats:", statsError);
+    toast.error("Failed to load dashboard statistics");
+  }
+
+  const { data: orders, isLoading: ordersLoading, error: ordersError } = useQuery({
     queryKey: ['admin-orders'],
     queryFn: getOrders,
-    onSettled: (data, error) => {
-      if (error) {
-        console.error("Failed to fetch orders:", error);
-        toast.error("Failed to load order data");
-      }
-    }
   });
+
+  if (ordersError) {
+    console.error("Failed to fetch orders:", ordersError);
+    toast.error("Failed to load order data");
+  }
 
   const isLoading = statsLoading || ordersLoading;
 
@@ -118,12 +116,12 @@ const AdminDashboard = () => {
           
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 mb-8">
-            <Card className="col-span-6 lg:col-span-4 shadow-soft backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none">
-              <CardHeader>
+            <Card className="col-span-6 lg:col-span-4 shadow-lg backdrop-blur-md bg-white/90 dark:bg-gray-800/90 border-none rounded-xl overflow-hidden">
+              <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                 <CardTitle className="text-xl font-medium">Sales Overview</CardTitle>
                 <CardDescription>Monthly revenue for the current year</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 {isLoading ? (
                   <div className="h-80 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
                 ) : (
@@ -132,12 +130,12 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
             
-            <Card className="col-span-6 lg:col-span-2 shadow-soft backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none">
-              <CardHeader>
+            <Card className="col-span-6 lg:col-span-2 shadow-lg backdrop-blur-md bg-white/90 dark:bg-gray-800/90 border-none rounded-xl overflow-hidden">
+              <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                 <CardTitle className="text-xl font-medium">Categories</CardTitle>
                 <CardDescription>Sales by product category</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 {isLoading ? (
                   <div className="h-80 bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
                 ) : (
@@ -148,8 +146,8 @@ const AdminDashboard = () => {
           </div>
           
           {/* Recent Orders Table */}
-          <Card className="shadow-soft backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-none">
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className="shadow-lg backdrop-blur-md bg-white/90 dark:bg-gray-800/90 border-none rounded-xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700">
               <div>
                 <CardTitle className="text-xl font-medium">Recent Orders</CardTitle>
                 <CardDescription>Latest customer purchases</CardDescription>

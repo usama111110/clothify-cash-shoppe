@@ -9,7 +9,8 @@ import {
   Settings,
   Home,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  ShoppingCart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -37,7 +38,7 @@ const Sidebar = () => {
     {
       name: "Products",
       path: "/admin/products",
-      icon: <Package size={20} />,
+      icon: <ShoppingCart size={20} />,
     },
     {
       name: "Orders",
@@ -59,13 +60,13 @@ const Sidebar = () => {
   return (
     <aside 
       className={cn(
-        "bg-sidebar shadow-xl transition-all duration-300 flex flex-col relative z-10",
+        "bg-sidebar shadow-xl transition-all duration-300 flex flex-col relative z-10 h-screen",
         collapsed ? "w-20" : "w-64"
       )}
     >
       <button 
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 bg-accent text-white rounded-full p-1 shadow-md hover:scale-110 transition-transform"
+        className="absolute -right-3 top-20 bg-accent text-white rounded-full p-1.5 shadow-md hover:scale-110 transition-transform"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <ChevronRight 
@@ -83,24 +84,26 @@ const Sidebar = () => {
         {collapsed ? (
           <span className="text-xl font-bold text-white">SH</span>
         ) : (
-          <Link to="/admin" className="text-xl font-bold text-white">
-            StyleHaven Admin
+          <Link to="/admin" className="text-xl font-bold text-white flex items-center">
+            <ShoppingBag className="mr-2" />
+            <span className="font-sans tracking-tight">STYLE</span>
+            <span className="font-light">HAVEN</span>
           </Link>
         )}
       </div>
 
       {/* Menu */}
       <nav className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-sidebar-accent scrollbar-track-sidebar">
-        <ul className="space-y-1">
+        <ul className="space-y-1.5">
           {menuItems.map((item) => (
             <li key={item.name}>
               <Link
                 to={item.path}
                 className={cn(
-                  "flex items-center py-2 px-4 rounded-md transition-all duration-200",
+                  "flex items-center py-2.5 px-4 rounded-lg transition-all duration-200",
                   isActive(item.path)
                     ? "bg-sidebar-primary text-white shadow-md translate-x-1"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-white"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-white"
                 )}
                 title={collapsed ? item.name : undefined}
               >
@@ -131,7 +134,7 @@ const Sidebar = () => {
           <Button 
             asChild 
             variant="ghost" 
-            className="justify-start text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent"
+            className="justify-start text-sidebar-foreground hover:text-white hover:bg-sidebar-accent/50 rounded-lg"
             title={collapsed ? "Back to Shop" : undefined}
           >
             <Link to="/">
@@ -141,7 +144,7 @@ const Sidebar = () => {
           </Button>
           <Button 
             variant="ghost" 
-            className="justify-start text-sidebar-foreground/80 hover:text-white hover:bg-sidebar-accent"
+            className="justify-start text-sidebar-foreground hover:text-white hover:bg-sidebar-accent/50 rounded-lg"
             onClick={handleLogout}
             title={collapsed ? "Logout" : undefined}
           >
