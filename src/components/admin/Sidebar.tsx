@@ -10,7 +10,8 @@ import {
   Home,
   LogOut,
   ChevronRight,
-  ShoppingCart
+  ShoppingCart,
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -39,6 +40,11 @@ const Sidebar = () => {
       name: "Products",
       path: "/admin/products",
       icon: <ShoppingCart size={20} />,
+      submenu: [
+        { name: "All Products", path: "/admin/products" },
+        { name: "Add Product", path: "/admin/products/add" },
+        { name: "Categories", path: "/admin/products/categories" },
+      ]
     },
     {
       name: "Orders",
@@ -66,7 +72,7 @@ const Sidebar = () => {
     >
       <button 
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 bg-accent text-white rounded-full p-1.5 shadow-md hover:scale-110 transition-transform"
+        className="absolute -right-3 top-20 bg-accent text-white rounded-full p-1.5 shadow-md hover:scale-110 transition-transform z-50"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <ChevronRight 
@@ -97,32 +103,85 @@ const Sidebar = () => {
         <ul className="space-y-1.5">
           {menuItems.map((item) => (
             <li key={item.name}>
-              <Link
-                to={item.path}
-                className={cn(
-                  "flex items-center py-2.5 px-4 rounded-lg transition-all duration-200",
-                  isActive(item.path)
-                    ? "bg-sidebar-primary text-white shadow-md translate-x-1"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-white"
-                )}
-                title={collapsed ? item.name : undefined}
-              >
-                <span className={cn(
-                  collapsed ? "mx-auto" : "mr-3",
-                  "transition-transform", 
-                  isActive(item.path) && !collapsed ? "scale-110" : ""
-                )}>
-                  {item.icon}
-                </span>
-                {!collapsed && (
+              {item.submenu ? (
+                <Collapsible>
+                  <div
+                    className={cn(
+                      "flex items-center justify-between py-2.5 px-4 rounded-lg cursor-pointer transition-all duration-200",
+                      isActive(item.path)
+                        ? "bg-sidebar-primary text-white shadow-md"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-white"
+                    )}
+                  >
+                    <div className="flex items-center">
+                      <span className={cn(
+                        collapsed ? "mx-auto" : "mr-3",
+                        "transition-transform", 
+                        isActive(item.path) && !collapsed ? "scale-110" : ""
+                      )}>
+                        {item.icon}
+                      </span>
+                      {!collapsed && (
+                        <span className={cn(
+                          "transition-transform",
+                          isActive(item.path) ? "font-medium" : ""
+                        )}>
+                          {item.name}
+                        </span>
+                      )}
+                    </div>
+                    {!collapsed && <ChevronDown size={16} />}
+                  </div>
+                  {!collapsed && (
+                    <CollapsibleContent>
+                      <ul className="mt-1 ml-8 space-y-1">
+                        {item.submenu.map((subitem) => (
+                          <li key={subitem.name}>
+                            <Link
+                              to={subitem.path}
+                              className={cn(
+                                "block py-2 px-3 rounded-md text-sm",
+                                isActive(subitem.path)
+                                  ? "bg-sidebar-accent/70 text-white"
+                                  : "text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-white"
+                              )}
+                            >
+                              {subitem.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </CollapsibleContent>
+                  )}
+                </Collapsible>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={cn(
+                    "flex items-center py-2.5 px-4 rounded-lg transition-all duration-200",
+                    isActive(item.path)
+                      ? "bg-sidebar-primary text-white shadow-md translate-x-1"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-white"
+                  )}
+                  title={collapsed ? item.name : undefined}
+                >
                   <span className={cn(
-                    "transition-transform",
-                    isActive(item.path) ? "font-medium" : ""
+                    collapsed ? "mx-auto" : "mr-3",
+                    "transition-transform", 
+                    isActive(item.path) && !collapsed ? "scale-110" : ""
                   )}>
-                    {item.name}
+                    {item.icon}
                   </span>
-                )}
-              </Link>
+                  {!collapsed && (
+                    <span className={cn(
+                      "transition-transform",
+                      isActive(item.path) ? "font-medium" : ""
+                    )}>
+                      {item.name}
+                    </span>
+                  )}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
