@@ -3,28 +3,52 @@
 
 This is a full-stack e-commerce application built with React, TypeScript, Tailwind CSS, and Flask.
 
-## Frontend (React)
+## Project Structure
 
-The frontend is built with:
+The project is organized into two main directories:
 
-- React
-- TypeScript
-- Tailwind CSS
-- Shadcn UI Components
-- React Router DOM
-- TanStack Query (React Query)
+- `/frontend` - React/TypeScript frontend application
+- `/backend` - Flask Python backend API
 
-## Backend (Flask)
+## Getting Started
 
-The backend is built with Flask, a Python web framework. The backend code is located in `server.py` in the root directory.
+### Backend Setup
 
-### Running the Backend
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
 
-1. Make sure you have Python installed
-2. Install dependencies: `pip install flask flask-cors`
-3. Run the Flask server: `python server.py`
+2. Install the required Python dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-The server will start at http://localhost:5000
+3. Start the Flask server:
+```bash
+python server.py
+```
+
+The API will be available at http://localhost:5000
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Install the required Node.js dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+The application will be available at http://localhost:8080
 
 ## Features
 
@@ -44,12 +68,3 @@ To access the admin dashboard:
 - URL: `/admin/login`
 - Username: `admin`
 - Password: `admin123`
-
-## Development
-
-1. Clone this repository
-2. Install frontend dependencies: `npm install` or `yarn`
-3. Start the frontend development server: `npm run dev` or `yarn dev`
-4. In a separate terminal, start the Flask backend: `python server.py`
-
-The application will be available at http://localhost:5173
