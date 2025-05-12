@@ -1,7 +1,11 @@
+
 import { Product, CartItem, Order, products, orders } from "../data/mockData";
 
 // API base URL - use the Flask server when available, fallback to mock data
-const API_BASE_URL = "http://localhost:5000/api";
+// This will work when running in Docker with the backend service named "backend"
+const API_BASE_URL = process.env.NODE_ENV === "production" 
+  ? "http://backend:5000/api"
+  : "http://localhost:5000/api";
 
 // Helper function to check if Flask API is available
 const isApiAvailable = async (): Promise<boolean> => {

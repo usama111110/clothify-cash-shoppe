@@ -12,7 +12,29 @@ The project is organized into two main directories:
 
 ## Getting Started
 
-### Backend Setup
+You can run this application using Docker or with traditional development setup.
+
+### Docker Setup (Recommended)
+
+1. Make sure you have Docker and Docker Compose installed on your machine.
+
+2. Build and start the containers:
+```bash
+docker-compose up --build
+```
+
+3. Access the application:
+   - Frontend: http://localhost
+   - Backend API: http://localhost:5000
+
+To stop the containers:
+```bash
+docker-compose down
+```
+
+### Traditional Setup
+
+#### Backend Setup
 
 1. Navigate to the backend directory:
 ```bash
@@ -31,7 +53,7 @@ python server.py
 
 The API will be available at http://localhost:5000
 
-### Frontend Setup
+#### Frontend Setup
 
 1. Navigate to the frontend directory:
 ```bash
